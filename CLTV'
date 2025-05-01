@@ -1,0 +1,59 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load dataset
+df = pd.read_csv("customer_acquisition_data.csv")
+
+# Calculate CLTV
+df['CLTV'] = df['revenue'] - df['cost']
+
+# Set global Seaborn style
+sns.set(style='whitegrid', context='talk', palette='Set2')
+
+# Define a common figure styling function
+def style_plot(title, xlabel, ylabel):
+    plt.title(title, fontsize=18, fontweight='bold')
+    plt.xlabel(xlabel, fontsize=14)
+    plt.ylabel(ylabel, fontsize=14)
+    plt.xticks(rotation=30)
+    plt.grid(True, linestyle='--', linewidth=0.5)
+    plt.tight_layout()
+
+# 1. Histogram of CLTV
+plt.figure(figsize=(10, 6))
+sns.histplot(df['CLTV'], bins=30, kde=True, color='mediumseagreen')
+style_plot("Distribution of Customer Lifetime Value (CLTV)", "CLTV", "Frequency")
+plt.show()
+
+# 2. Boxplot of CLTV by Channel
+plt.figure(figsize=(10, 6))
+sns.boxplot(x='channel', y='CLTV', data=df, palette='Set3', width=0.6, fliersize=4)
+style_plot("CLTV by Acquisition Channel", "Channel", "CLTV")
+plt.show()
+
+# 3. Bar plot of Average CLTV by Channel
+avg_cltv_by_channel = df.groupby('channel')['CLTV'].mean().sort_values(ascending=False)
+plt.figure(figsize=(10, 6))
+sns.barplot(x=avg_cltv_by_channel.index, y=avg_cltv_by_channel.values, palette='viridis')
+style_plot("Average CLTV by Channel", "Channel", "Average CLTV")
+plt.show()
+
+# 4. Scatter plot: Cost vs Revenue with CLTV as color
+plt.figure(figsize=(10, 6))
+scatter = sns.scatterplot(x='cost', y='revenue', hue='CLTV', palette='coolwarm', data=df, s=80, edgecolor='gray')
+style_plot("Cost vs Revenue (CLTV as Color)", "Acquisition Cost", "Revenue")
+plt.legend(title='CLTV', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.show()
+
+# 5. Conversion Rate vs CLTV
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='conversion_rate', y='CLTV', data=df, color='royalblue', s=70)
+style_plot("Conversion Rate vs CLTV", "Conversion Rate", "CLTV")
+plt.show()
+
+# 6. Revenue vs CLTV
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='revenue', y='CLTV', data=df, color='darkorange', s=70)
+style_plot("Revenue vs CLTV", "Revenue", "CLTV")
+plt.show()
